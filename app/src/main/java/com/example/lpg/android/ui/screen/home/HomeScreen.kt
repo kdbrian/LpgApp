@@ -1,5 +1,6 @@
 package com.example.lpg.android.ui.screen.home
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
@@ -22,44 +25,72 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.lpg.android.ui.composables.ProductCard
+import com.example.lpg.android.R
+import com.example.lpg.android.data.model.CartObject
+import com.example.lpg.android.data.model.GasItem
+import com.example.lpg.android.ui.components.ProductCard
+import com.example.lpg.android.ui.components.ProductCardLoading
 import com.example.lpg.android.ui.nav.Cart
+import com.example.lpg.android.ui.nav.Orders
+import com.example.lpg.android.ui.screen.detail.ProductDetailsBottomSheet
 import com.example.lpg.android.ui.theme.LpgGasAppTheme
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    cartItems: List<CartObject> = listOf(),
+    onAddToCart: (GasItem) -> Unit = {},
     navController: NavHostController,
 ) {
 
     var isCategoryDropDownExpanded by remember { mutableStateOf(false) }
     val categories = listOf("All", "3 Kg", "6 Kg", "13 Kg")
-    val selectedCategory = remember { mutableIntStateOf(0) }
+    var selectedCategory by remember { mutableIntStateOf(0) }
     val icon = remember {
         derivedStateOf {
             if (isCategoryDropDownExpanded) Icons.Rounded.KeyboardArrowUp
             else Icons.Rounded.KeyboardArrowDown
         }
     }
+    var isDetailsBottomSheetShown by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    val (selectedProduct, setSelectedProduct) = remember {
+        mutableStateOf<GasItem?>(null)
+    }
+
+    val onDismissSheet: () -> Unit = {
+        scope.launch {
+            sheetState.hide()
+            isDetailsBottomSheetShown = !isDetailsBottomSheetShown
+        }
+    }
+
 
     Column(
         modifier = modifier
@@ -76,6 +107,10 @@ fun HomeScreen(
                 )
             },
             actions = {
+                IconButton(onClick = { navController.navigate(Orders) }) {
+                    Icon(painter = painterResource(R.drawable.orders_24), contentDescription = null)
+                }
+
                 IconButton(onClick = { navController.navigate(Cart) }) {
                     Icon(imageVector = Icons.Rounded.ShoppingCart, contentDescription = null)
                 }
@@ -85,7 +120,9 @@ fun HomeScreen(
         Spacer(Modifier.height(8.dp))
 
         Row(
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
@@ -95,35 +132,76 @@ fun HomeScreen(
 
             Box {
                 OutlinedTextField(
-                    value = "",
+                    value = categories[selectedCategory],
                     onValueChange = {},
-                    modifier = Modifier.width(150.dp).wrapContentHeight(),
+                    enabled = false,
+                    modifier = Modifier
+                        .width(150.dp)
+                        .wrapContentHeight()
+                        .pointerInput(Unit) {
+                            detectTapGestures {
+                                isCategoryDropDownExpanded = !isCategoryDropDownExpanded
+                            }
+                        },
                     trailingIcon = {
                         Icon(imageVector = icon.value, contentDescription = null)
-                    }
+                    },
+                    shape = RoundedCornerShape(24.dp)
                 )
 
                 DropdownMenu(
                     expanded = isCategoryDropDownExpanded,
                     onDismissRequest = { isCategoryDropDownExpanded = false }
                 ) {
-                    categories.forEach {
+                    categories.forEachIndexed { index, category ->
                         DropdownMenuItem(
-                            text = { Text(text = it) },
-                            onClick = { isCategoryDropDownExpanded = false }
+                            text = { Text(text = category) },
+                            onClick = {
+                                selectedCategory = index
+                                isCategoryDropDownExpanded = false
+                            }
                         )
                     }
                 }
             }
         }
 
-
         Spacer(Modifier.height(12.dp))
 
         LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-            items(8) {
-                ProductCard()
+            items(GasItem.defaultItems) { gasItem ->
+                ProductCard(
+                    gasItem = gasItem,
+                    onSelect = {
+                        isDetailsBottomSheetShown = !isDetailsBottomSheetShown
+                        setSelectedProduct(it)
+                    }
+                )
             }
+        }
+
+        if (isDetailsBottomSheetShown) {
+            ModalBottomSheet(
+                onDismissRequest = onDismissSheet,
+                sheetState = sheetState,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                selectedProduct?.let { item ->
+                    ProductDetailsBottomSheet(
+                        gasItem = item,
+                        onAddToCart = {
+                            onAddToCart(it)
+                            onDismissSheet()
+                        },
+                        onClose = onDismissSheet
+                    )
+                } ?: kotlin.run {
+                    ProductCardLoading()
+                }
+
+            }
+
         }
 
     }

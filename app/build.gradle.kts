@@ -61,10 +61,15 @@ dependencies {
 
     implementation(libs.retrofit) // retrofit
     implementation(libs.converter.gson) // converter gson
+
     implementation(libs.coil.compose) // coil
+    implementation(libs.coil.network.okhttp) // coil nethttp
+
     implementation(libs.androidx.navigation.compose) // navigation
+
     implementation(libs.androidx.security.crypto) //for encrypted shared prefs
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+    implementation(libs.kotlinx.serialization.json) // serialization json
+
 
 }

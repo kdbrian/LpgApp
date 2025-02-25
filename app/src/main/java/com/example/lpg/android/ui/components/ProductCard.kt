@@ -1,6 +1,7 @@
-package com.example.lpg.android.ui.composables
+package com.example.lpg.android.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -24,17 +26,28 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.example.lpg.android.R
+import com.example.lpg.android.data.model.GasItem
 import com.example.lpg.android.ui.theme.LpgGasAppTheme
+import com.example.lpg.android.util.formatTo2DecimalPlaces
 
 @Composable
-fun ProductCard(modifier: Modifier = Modifier) {
+fun ProductCard(
+    modifier: Modifier = Modifier,
+    gasItem: GasItem,
+    onSelect : (GasItem) -> Unit = {}
+) {
 
     Column(
-        modifier = modifier.fillMaxWidth().padding(12.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onSelect(gasItem) }
+            .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         AsyncImage(
-            model = "https://thispersondoesnotexist.com/",
+            model = gasItem.imageUrl,
+            placeholder = painterResource(R.drawable.gas_demo),
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
@@ -42,15 +55,12 @@ fun ProductCard(modifier: Modifier = Modifier) {
                 .clip(RoundedCornerShape(12.dp))
         )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = buildAnnotatedString {
+        Text(text = gasItem.name, style = MaterialTheme.typography.titleMedium)
+
+        Text(text = buildAnnotatedString {
                 withStyle(
                     SpanStyle(
-                        fontSize = 24.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.LightGray
                     )
@@ -61,16 +71,13 @@ fun ProductCard(modifier: Modifier = Modifier) {
 
                 withStyle(
                     SpanStyle(
-                        fontSize = 28.sp,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Light,
                     )
                 ) {
-                    append(" 1,000")
+                    append(gasItem.price.formatTo2DecimalPlaces())
                 }
             })
-
-            Text(text = "13Kg", style = MaterialTheme.typography.titleMedium)
-        }
 
     }
 
@@ -130,7 +137,7 @@ fun ProductCardLoading(modifier: Modifier = Modifier) {
 @Composable
 private fun ProductCardPrev() {
     LpgGasAppTheme {
-        ProductCard()
+//        ProductCard()
     }
 }
 

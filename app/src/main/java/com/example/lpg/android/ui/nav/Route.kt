@@ -17,3 +17,9 @@ data object Cart : Route()
 
 @Serializable
 data object CheckOut : Route()
+
+@Serializable
+data object Orders : Route()
+
+@Serializable
+data object AddressInfo : Route()

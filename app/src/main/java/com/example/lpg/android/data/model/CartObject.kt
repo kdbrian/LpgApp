@@ -5,5 +5,5 @@ import androidx.compose.runtime.Stable
 @Stable
 data class CartObject(
     val item : GasItem,
-    val count : Int = 1
+    var count : Int = 1
 )

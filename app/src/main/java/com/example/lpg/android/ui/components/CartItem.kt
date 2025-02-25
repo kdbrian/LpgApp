@@ -1,9 +1,7 @@
-package com.example.lpg.android.ui.composables
+package com.example.lpg.android.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,23 +24,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.example.lpg.android.R
+import com.example.lpg.android.data.model.CartObject
 import com.example.lpg.android.ui.theme.LpgGasAppTheme
+import com.example.lpg.android.util.formatTo2DecimalPlaces
 
 @Composable
 fun CartItem(
     modifier: Modifier = Modifier,
+    cartObject: CartObject,
+    onRemove: () -> Unit = {},
 ) {
 
     var isExpanded by remember { mutableStateOf(true) }
-    val (count, setCount) = remember { mutableIntStateOf(1) }
-    val total = remember {
+    val (count, setCount) = remember { mutableIntStateOf(cartObject.count) }
+    val total = remember(count) {
         derivedStateOf {
-            count * 3000.99
+            count * cartObject.item.price
         }
     }
 
@@ -61,19 +64,27 @@ fun CartItem(
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Box(
-//            model = "",
-//            contentDescription = null,
+                AsyncImage(
+                    model = cartObject.item.imageUrl,
+                    placeholder = painterResource(R.drawable.gas_demo),
+                    contentDescription = cartObject.item.name,
                     modifier = Modifier
                         .size(80.dp)
-                        .background(color = Color.LightGray, shape = RoundedCornerShape(6.dp))
+                        .clip(RoundedCornerShape(6.dp))
                 )
 
                 Column {
-                    Text(text = "Size : 13 Kg", style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        text = "Size : ${cartObject.item.name}",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Text(
+                        text = "Price : ${cartObject.item.price.formatTo2DecimalPlaces()}",
+                        style = MaterialTheme.typography.bodySmall
+                    )
                     Text(text = "Units : $count", style = MaterialTheme.typography.bodySmall)
                     Text(
-                        text = "Total : KES ${total.value}",
+                        text = "Total : KES ${total.value.formatTo2DecimalPlaces()}",
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -89,7 +100,12 @@ fun CartItem(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = {
-                        if (count > 1) setCount(count - 1)
+                        if (count > 1) {
+                            setCount(count - 1)
+                            cartObject.count = count
+                        } else if (count == 1) {
+                            onRemove()
+                        }
                     }) {
                         Icon(
                             painter = painterResource(R.drawable.remove_24dp),
@@ -99,6 +115,7 @@ fun CartItem(
                     Text(text = "$count")
                     IconButton(onClick = {
                         setCount(count + 1)
+                        cartObject.count = count
                     }) {
                         Icon(
                             imageVector = Icons.Rounded.Add,
@@ -120,7 +137,7 @@ fun CartItem(
 @Composable
 private fun CartItemPrev() {
     LpgGasAppTheme {
-        CartItem()
+//        CartItem()
     }
 }
 
