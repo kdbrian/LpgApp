@@ -1,12 +1,15 @@
 package com.example.lpg.android.util
 
 import android.annotation.SuppressLint
+import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 fun Double.formatTo2DecimalPlaces(): String {
-    return String.format(Locale.getDefault(), "%.2f", this)
+    val currencyFormatter = NumberFormat.getCurrencyInstance().format(this)
+    return String
+        .format(Locale.getDefault(), currencyFormatter.replace("$", ""), this)
 }
 
 @SuppressLint("NewApi")

@@ -13,7 +13,7 @@ import kotlin.uuid.toJavaUuid
 data class OrderModel @OptIn(ExperimentalUuidApi::class) constructor(
     val orderId: String = Uuid.random().toJavaUuid().toString(),
     val total: Double,
-    @SuppressLint("NewApi") val datePlaced: String = LocalDateTime.now().formatToDateTime(),
+    val datePlaced: String = LocalDateTime.now().formatToDateTime(),
     val items: Int,
 ) {
     companion object {

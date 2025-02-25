@@ -71,5 +71,10 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.json) // serialization json
 
+    implementation(libs.retrofit) // retrofit
+    implementation(libs.converter.gson) // retrofit - gson
+
+    implementation(libs.androidx.paging.runtime.ktx) // paging runtime
+    implementation(libs.androidx.paging.compose) // paging compose
 
 }

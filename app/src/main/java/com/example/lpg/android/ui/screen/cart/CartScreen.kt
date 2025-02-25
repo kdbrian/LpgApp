@@ -38,8 +38,9 @@ import com.example.lpg.android.util.formatTo2DecimalPlaces
 @Composable
 fun CartScreen(
     modifier: Modifier = Modifier,
-    onClose: () -> Unit = {},
     cartItems: List<CartObject>,
+    onClose: () -> Unit = {},
+    onClearCart: () -> Unit = {},
     onRemoveFromCart: (GasItem) -> Unit,
 ) {
 
@@ -62,18 +63,9 @@ fun CartScreen(
                         }
                     },
                     actions = {
-
-                        IconButton(onClick = {}) {
-                            Icon(
-                                painter = painterResource(R.drawable.orders_24),
-                                contentDescription = null
-                            )
-                        }
-
-                        IconButton(onClick = {}) {
+                        IconButton(onClick = onClearCart) {
                             Icon(imageVector = Icons.Rounded.Delete, contentDescription = null)
                         }
-
                     }
                 )
             }
@@ -104,27 +96,16 @@ fun CartScreen(
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(bottom = 32.dp)
                 .padding(24.dp)
                 .align(Alignment.BottomCenter),
             contentPadding = ButtonDefaults.TextButtonContentPadding
         ) {
             Text(
+                modifier = Modifier.padding(6.dp),
                 text = buildAnnotatedString {
                     withStyle(SpanStyle()) {
                         append("Proceed to checkout")
-                    }
-
-                    withStyle(
-                        SpanStyle(
-                            fontSize = 12.sp
-                        )
-                    ) {
-                        append(
-                            "(Kes : ${
-                                if (cartItems.isNotEmpty()) cartItems.sumOf { it.item.price }
-                                    .formatTo2DecimalPlaces() else 0.0
-                            })"
-                        )
                     }
                 }
             )
@@ -141,7 +122,7 @@ private fun CartScreenPrev() {
     LpgGasAppTheme {
         CartScreen(
             cartItems = listOf(),
-            onRemoveFromCart = { }
+            onRemoveFromCart = { },
         )
     }
 }

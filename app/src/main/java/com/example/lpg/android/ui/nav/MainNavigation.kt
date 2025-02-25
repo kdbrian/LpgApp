@@ -1,35 +1,37 @@
 package com.example.lpg.android.ui.nav
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.lpg.android.data.model.CartObject
 import com.example.lpg.android.data.model.GasItem
 import com.example.lpg.android.ui.screen.cart.CartScreen
 import com.example.lpg.android.ui.screen.checkout.CheckOutScreen
 import com.example.lpg.android.ui.screen.checkout.FillInAddressInfo
 import com.example.lpg.android.ui.screen.home.HomeScreen
 import com.example.lpg.android.ui.screen.orders.OrderScreen
+import com.example.lpg.android.ui.viewmodel.CartViewModel
+import com.example.lpg.android.ui.viewmodel.CylinderViewModel
 
 
 @Composable
-fun MainNavigation() {
+fun MainNavigation(
+    cylinderViewModel: CylinderViewModel,
+    cartViewModel: CartViewModel,
+) {
 
     val navController = rememberNavController()
-    val cartItems = remember {
-        mutableStateListOf<CartObject>()
-    }
+    val cartItems by cartViewModel.cartItems.collectAsState()
+    val cartTotal by cartViewModel.cartTotal.collectAsState()
     val onAddToCart: (GasItem) -> Unit = {
-        cartItems.add(CartObject(item = it, count = 1))
+        cartViewModel.addItem(it)
     }
-    val onRemoveFromCart: (GasItem) -> Unit = { cartObject ->
-        cartItems.removeIf { it.item == cartObject }
+    val onRemoveFromCart: (GasItem) -> Unit = {
+        cartViewModel.removeItem(it)
     }
-
 
     NavHost(
         navController = navController,
@@ -38,7 +40,9 @@ fun MainNavigation() {
         composable<Home> {
             HomeScreen(
                 navController = navController,
-                onAddToCart = onAddToCart
+                onAddToCart = onAddToCart,
+                cylinderViewModel = cylinderViewModel,
+                cartItems = cartItems
             )
         }
 
@@ -52,7 +56,8 @@ fun MainNavigation() {
             CartScreen(
                 cartItems = cartItems,
                 onRemoveFromCart = onRemoveFromCart,
-                onClose = { navController.popBackStack() }
+                onClose = { navController.popBackStack() },
+                onClearCart = { cartViewModel.clearCart() }
             )
         }
 

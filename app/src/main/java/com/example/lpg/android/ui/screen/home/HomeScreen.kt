@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
@@ -47,7 +46,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.lpg.android.R
 import com.example.lpg.android.data.model.CartObject
 import com.example.lpg.android.data.model.GasItem
@@ -57,15 +57,17 @@ import com.example.lpg.android.ui.nav.Cart
 import com.example.lpg.android.ui.nav.Orders
 import com.example.lpg.android.ui.screen.detail.ProductDetailsBottomSheet
 import com.example.lpg.android.ui.theme.LpgGasAppTheme
+import com.example.lpg.android.ui.viewmodel.CylinderViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    cartItems: List<CartObject> = listOf(),
-    onAddToCart: (GasItem) -> Unit = {},
+    cartItems: List<CartObject>,
     navController: NavHostController,
+    onAddToCart: (GasItem) -> Unit = {},
+    cylinderViewModel: CylinderViewModel,
 ) {
 
     var isCategoryDropDownExpanded by remember { mutableStateOf(false) }
@@ -83,6 +85,7 @@ fun HomeScreen(
     val (selectedProduct, setSelectedProduct) = remember {
         mutableStateOf<GasItem?>(null)
     }
+    val gasItems = cylinderViewModel.gasItems.collectAsLazyPagingItems()
 
     val onDismissSheet: () -> Unit = {
         scope.launch {
@@ -167,17 +170,45 @@ fun HomeScreen(
         }
 
         Spacer(Modifier.height(12.dp))
-
         LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-            items(GasItem.defaultItems) { gasItem ->
-                ProductCard(
-                    gasItem = gasItem,
-                    onSelect = {
-                        isDetailsBottomSheetShown = !isDetailsBottomSheetShown
-                        setSelectedProduct(it)
-                    }
-                )
+            items(gasItems.itemCount) { index ->
+                gasItems[index]?.let { gasItem ->
+                    ProductCard(
+                        gasItem = gasItem,
+                        onSelect = {
+                            isDetailsBottomSheetShown = !isDetailsBottomSheetShown
+                            setSelectedProduct(it)
+                        }
+                    )
+                }
             }
+
+            gasItems.apply {
+                println("state : $loadState")
+                when (loadState.append) {
+                    is LoadState.Loading -> {
+                        item(3) {
+                            ProductCardLoading()
+                        }
+                    }
+
+                    is LoadState.Error -> {
+                        item { Text(text = "Failed to load more items.") }
+                    }
+
+                    is LoadState.NotLoading -> {
+                        if (loadState.append.endOfPaginationReached) {
+                            item {
+                                Text(
+                                    text = "No more items",
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
         }
 
         if (isDetailsBottomSheetShown) {
@@ -213,9 +244,9 @@ fun HomeScreen(
 @Composable
 private fun HomeScreenPrev() {
     LpgGasAppTheme {
-        HomeScreen(
-            navController = rememberNavController()
-        )
+//        HomeScreen(
+//            navController = rememberNavController()
+//        )
     }
 }
 

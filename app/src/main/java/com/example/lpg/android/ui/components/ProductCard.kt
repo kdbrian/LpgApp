@@ -45,6 +45,7 @@ fun ProductCard(
             .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+
         AsyncImage(
             model = gasItem.imageUrl,
             placeholder = painterResource(R.drawable.gas_demo),

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,12 +14,12 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -48,10 +49,25 @@ fun ProductDetailsBottomSheet(
             .padding(12.dp),
     ) {
 
-        Box {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
             IconButton(onClick = onClose) {
                 Icon(imageVector = Icons.Rounded.Close, contentDescription = null)
             }
+
+            IconButton(onClick = { onAddToCart(gasItem) }) {
+                Icon(
+                    painter = painterResource(R.drawable.add_shopping_cart_24dp),
+                    contentDescription = null
+                )
+            }
+        }
+
+
             AsyncImage(
                 model = gasItem.imageUrl,
                 placeholder = painterResource(R.drawable.gas_demo),
@@ -61,7 +77,6 @@ fun ProductDetailsBottomSheet(
                     .height(200.dp)
                     .clip(RoundedCornerShape(12.dp))
             )
-        }
 
         Spacer(Modifier.height(12.dp))
 
@@ -90,15 +105,7 @@ fun ProductDetailsBottomSheet(
             }
         })
 
-        Button(
-            onClick = { onAddToCart(gasItem) },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Text(text = "Add to cart")
-        }
-
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(16.dp))
 
         Text(text = "More like this", style = MaterialTheme.typography.labelLarge)
 
@@ -132,7 +139,6 @@ fun ProductDetailsBottomSheet(
 
 
                 }
-
             }
         }
     }
