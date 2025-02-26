@@ -1,6 +1,5 @@
 package com.example.lpg.android.data.model
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.Stable
 import com.example.lpg.android.util.formatToDateTime
 import java.time.LocalDateTime
