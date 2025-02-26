@@ -104,7 +104,7 @@ fun HomeScreen(
         TopAppBar(
             title = {
                 Text(
-                    text = "Lpg Gas Exchange",
+                    text = "Lpg Gas Cylinder",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.SemiBold
                 )

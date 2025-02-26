@@ -82,12 +82,18 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
-    // ViewModel // LiveData // Lifecycles only (without ViewModel or LiveData)
+    // ViewModel // LiveData // Lifecycles 
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.lifecycle.livedata)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.runtime.livedata)
 
     implementation(libs.android.database.sqlcipher) // sqlcipher
+
+    implementation(libs.androidx.constraintlayout.compose) // constraintlayout
+
+
+    implementation(libs.androidx.datastore.preferences) // datastore
+
 
 }

@@ -10,8 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class CartViewModel : ViewModel() {
 
-
-    private val _cartItems = MutableStateFlow<List<CartObject>>(emptyList())
+    private val _cartItems = MutableStateFlow<List<CartObject>>(listOf())
     val cartItems: StateFlow<List<CartObject>> = _cartItems.asStateFlow()
 
     private val _cartTotal = MutableStateFlow(0.0)

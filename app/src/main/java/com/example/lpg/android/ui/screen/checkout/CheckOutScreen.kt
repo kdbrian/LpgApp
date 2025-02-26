@@ -29,6 +29,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -66,7 +67,7 @@ fun CheckOutScreen(
             PaymentMethod.paymentMethods[selectedPaymentMethod.intValue]
         }
     }
-    val shippingFee = remember {
+    val shippingFee by remember {
         mutableIntStateOf(Random.nextInt(100, 500))
     }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -95,6 +96,24 @@ fun CheckOutScreen(
         })
     }, bottomBar = {
         BottomAppBar {
+            Button(
+                onClick = {
+
+                    val order = Order(
+                        items = cartItems,
+                        paymentMethod = paymentMethod.value.method,
+                        address = addressInfo,
+                        total = cartTotal + shippingFee.toDouble()
+                    )
+
+                    onCheckout(order)
+
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Complete")
+
+            }
 
         }
     }) { paddingValues ->
@@ -127,7 +146,7 @@ fun CheckOutScreen(
                     style = MaterialTheme.typography.labelMedium
                 )
                 Text(
-                    text = "Total : ${cartTotal + shippingFee.intValue.toDouble()}",
+                    text = "Total : ${cartTotal + shippingFee.toDouble()}",
                     style = MaterialTheme.typography.labelMedium
                 )
 
@@ -249,26 +268,6 @@ fun CheckOutScreen(
                         )
                     }
                 }
-
-            }
-
-
-            Button(
-                onClick = {
-
-                    val order = Order(
-                        items = cartItems,
-                        paymentMethod = paymentMethod.value.method,
-                        address = addressInfo,
-                        total = cartTotal + shippingFee.intValue.toDouble()
-                    )
-
-                    onCheckout(order)
-
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Complete")
 
             }
 

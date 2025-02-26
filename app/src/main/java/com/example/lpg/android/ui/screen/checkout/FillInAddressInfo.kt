@@ -17,6 +17,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -43,12 +44,12 @@ fun FillInAddressInfo(
     modifier: Modifier = Modifier,
     addressInfo: Address? = null,
     onClose: () -> Unit = {},
-    onSave: (Address) -> Unit = {},
+    onSave: (Address, Boolean) -> Unit = { _, _ -> },
 ) {
 
     val (location, setLocation) = remember { mutableStateOf(addressInfo?.locationName ?: "") }
     val (address, setAddress) = remember { mutableStateOf(addressInfo?.addressCode ?: "") }
-    val (phone, setPhone) = remember { mutableStateOf(addressInfo?.addressCode ?: "") }
+    val (phone, setPhone) = remember { mutableStateOf(addressInfo?.phoneNumber ?: "") }
 
     val snackBarState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
@@ -81,14 +82,19 @@ fun FillInAddressInfo(
                 },
                 actions = {
                     IconButton(onClick = {
-                        if (location.isNotEmpty() && address.isNotEmpty() && phone.isNotEmpty())
-                            onSave(
-                                Address(
+                        if (location.isNotEmpty() && address.isNotEmpty() && phone.isNotEmpty()) {
+                            val myAdress = Address(
                                     locationName = location,
                                     addressCode = address,
                                     phoneNumber = phone
                                 )
-                            )
+                            scope.launch {
+                                when(snackBarState.showSnackbar("Save my address info", "Ok")){
+                                    SnackbarResult.ActionPerformed -> onSave(myAdress, true)
+                                    SnackbarResult.Dismissed -> onSave(myAdress, false)
+                                }
+                            }
+                        }
                     }) {
                         Icon(
                             painter = painterResource(R.drawable.save_24dp),
