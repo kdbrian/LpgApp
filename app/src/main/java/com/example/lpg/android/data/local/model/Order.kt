@@ -4,12 +4,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.lpg.android.data.model.Address
 import com.example.lpg.android.data.model.CartObject
-import com.example.lpg.android.data.model.GasItem
 import com.example.lpg.android.util.formatToDateTime
 import java.time.LocalDateTime
 import java.util.UUID
-import kotlin.uuid.Uuid
-import kotlin.uuid.toJavaUuid
 
 @Entity(tableName = "orders")
 data class Order(

@@ -1,10 +1,8 @@
 package com.example.lpg.android.data.remote.api
 
 import okhttp3.OkHttpClient
-import okhttp3.Protocol
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.HTTP
 
 object MockApiClient {
 

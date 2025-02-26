@@ -1,7 +1,6 @@
 package com.example.lpg.android.data.model
 
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import kotlinx.serialization.Serializable
 
 @Stable

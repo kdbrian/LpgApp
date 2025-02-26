@@ -11,6 +11,18 @@ android {
     namespace = "com.example.lpg.android"
     compileSdk = 35
 
+    //customize build apk output
+    applicationVariants.all {
+        val variant = this
+        outputs.all {
+            val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            val versionName = variant.versionName
+            val variantName = variant.name
+
+            output.outputFileName = "apk-$versionName-$variantName.apk"
+        }
+    }
+
     defaultConfig {
         applicationId = "com.example.lpg.android"
         minSdk = 24
