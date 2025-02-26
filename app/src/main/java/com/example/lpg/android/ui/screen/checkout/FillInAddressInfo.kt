@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.lpg.android.R
@@ -47,6 +48,8 @@ fun FillInAddressInfo(
 
     val (location, setLocation) = remember { mutableStateOf(addressInfo?.locationName ?: "") }
     val (address, setAddress) = remember { mutableStateOf(addressInfo?.addressCode ?: "") }
+    val (phone, setPhone) = remember { mutableStateOf(addressInfo?.addressCode ?: "") }
+
     val snackBarState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -78,15 +81,14 @@ fun FillInAddressInfo(
                 },
                 actions = {
                     IconButton(onClick = {
-                        if (location.isNotEmpty() || address.isNotEmpty())
+                        if (location.isNotEmpty() && address.isNotEmpty() && phone.isNotEmpty())
                             onSave(
                                 Address(
                                     locationName = location,
-                                    addressCode = address
+                                    addressCode = address,
+                                    phoneNumber = phone
                                 )
                             )
-//                    else
-//                        Toast.make
                     }) {
                         Icon(
                             painter = painterResource(R.drawable.save_24dp),
@@ -131,7 +133,21 @@ fun FillInAddressInfo(
                     .padding(12.dp),
                 placeholder = { Text(text = "e.g 21 street") },
                 label = { Text(text = "Address") },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(onDone = {
+                        focusManager.moveFocus(FocusDirection.Down)
+                })
+            )
+
+            OutlinedTextField(
+                value = phone,
+                onValueChange = setPhone,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                placeholder = { Text(text = "e.g 254/07 ...") },
+                label = { Text(text = "Phone") },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Number),
                 keyboardActions = KeyboardActions(onDone = {
                     scope.launch {
                         focusManager.clearFocus(true)

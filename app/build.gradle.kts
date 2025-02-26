@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.devtoolsKsp)
 
     kotlin("plugin.serialization") version "2.1.10"
 }
@@ -63,7 +64,7 @@ dependencies {
     implementation(libs.converter.gson) // converter gson
 
     implementation(libs.coil.compose) // coil
-    implementation(libs.coil.network.okhttp) // coil nethttp
+    implementation(libs.coil.network.okhttp) // coil net http
 
     implementation(libs.androidx.navigation.compose) // navigation
 
@@ -76,5 +77,17 @@ dependencies {
 
     implementation(libs.androidx.paging.runtime.ktx) // paging runtime
     implementation(libs.androidx.paging.compose) // paging compose
+
+    implementation(libs.androidx.room.runtime)  //room
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+
+    // ViewModel // LiveData // Lifecycles only (without ViewModel or LiveData)
+    implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.androidx.lifecycle.livedata)
+    implementation(libs.androidx.lifecycle.runtime)
+    implementation(libs.androidx.runtime.livedata)
+
+    implementation(libs.android.database.sqlcipher) // sqlcipher
 
 }

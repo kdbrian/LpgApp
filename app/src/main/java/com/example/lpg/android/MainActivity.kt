@@ -9,11 +9,13 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.lpg.android.data.local.LpgAppDb
 import com.example.lpg.android.data.remote.api.MockApiClient
 import com.example.lpg.android.ui.nav.MainNavigation
 import com.example.lpg.android.ui.theme.LpgGasAppTheme
 import com.example.lpg.android.ui.viewmodel.CartViewModel
 import com.example.lpg.android.ui.viewmodel.CylinderViewModel
+import com.example.lpg.android.ui.viewmodel.OrdersViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,6 +25,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             LpgGasAppTheme {
                 App {
+
+                    val appDb = LpgAppDb.getDatabase(this)
 
                     LocalViewModelStoreOwner.current?.let { viewModelStoreOwner ->
 
@@ -40,9 +44,17 @@ class MainActivity : ComponentActivity() {
                             factory = CartViewModel.Factory()
                         )
 
+                        val orderViewModel = viewModel(
+                            modelClass = OrdersViewModel::class,
+                            viewModelStoreOwner = viewModelStoreOwner,
+                            key = CartViewModel::class.simpleName,
+                            factory = OrdersViewModel.Factory(appDb.ordersDao())
+                        )
+
                         MainNavigation(
                             cylinderViewModel = cylinderViewModel,
-                            cartViewModel = cartViewModel
+                            cartViewModel = cartViewModel,
+                            orderViewModel = orderViewModel
                         )
 
                     }

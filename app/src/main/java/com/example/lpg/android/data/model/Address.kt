@@ -9,16 +9,18 @@ import kotlinx.serialization.Serializable
 data class Address(
     var locationName: String,
     var addressCode: String,
+    val phoneNumber: String
 ) {
 
     override fun toString(): String {
-        return "123 $locationName, ($addressCode)"
+        return "$locationName, $addressCode\n$phoneNumber"
     }
 
     companion object {
         val default = Address(
-            locationName = LoremIpsum(2).values.joinToString(),
-            addressCode = LoremIpsum(6).values.joinToString()
+            locationName = "",
+            addressCode = "",
+            phoneNumber = "254",
         )
     }
 }
